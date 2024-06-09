@@ -59,7 +59,7 @@ For more information on obtaining an API key, visit the [OpenAI documentation](h
 To interact with the application, simply run it and follow the terminal prompts to specify the type of website you want to build. The application will use different agents to generate the necessary code.
 
 The generated backend code can be found in `src/templates/web_server/src/main.rs`.
-The frontend is under development and will be added in future updates.
+The generated frontend code can be found in ``src/templates/web_app/src`.
 
 ## Running Tests
 

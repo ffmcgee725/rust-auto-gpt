@@ -9,6 +9,7 @@ use crate::{
         agents::{
             agent_architect::AgentSolutionArchitect,
             agent_backend::AgentBackendDeveloper,
+            agent_frontend::AgentFrontendDeveloper,
             agent_trait::{FactSheet, SpecialFunctions},
         },
     },
@@ -72,6 +73,8 @@ impl ManagingAgent {
     fn create_agents(&mut self) {
         self.add_agent(Box::new(AgentSolutionArchitect::new()));
         self.add_agent(Box::new(AgentBackendDeveloper::new()));
+        // TODO: add FE dev
+        // self.add_agent(Box::new(AgentFrontendDeveloper::new()));
     }
 
     fn add_agent(&mut self, agent: Box<dyn SpecialFunctions>) {

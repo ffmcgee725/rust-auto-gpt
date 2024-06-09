@@ -6,6 +6,7 @@ use reqwest::Client;
 use serde::de::DeserializeOwned;
 
 pub const WEB_SERVER_PROJECT_PATH: &str = "src/templates/web_server";
+pub const WEB_APP_PROJECT_PATH: &str = "src/templates/web_app";
 const CODE_TEMPLATE_PATH: &str = "src/templates/web_server/src/code_template.rs";
 const EXEC_MAIN_PATH: &str = "src/templates/web_server/src/main.rs";
 const API_SCHEMA_JSON: &str = "schemas/api_schema.json";
@@ -90,6 +91,16 @@ pub fn save_backend_code(content: &str) -> () {
 pub fn save_api_endpoints(api_endpoints: &String) {
     let path: String = String::from(API_SCHEMA_JSON);
     fs::write(path, api_endpoints).expect("Failed to write API endpoints to file");
+}
+
+pub fn save_frontend_code(frontend_path: &String, contents: &String) {
+    let path: String = format!("{}{}", WEB_APP_PROJECT_PATH, frontend_path);
+    fs::write(path, contents).expect("Something went wrong saving the file");
+}
+
+pub fn read_frontend_code_contents(frontend_path: &String) -> String {
+    let path: String = format!("{}{}", WEB_APP_PROJECT_PATH, frontend_path);
+    fs::read_to_string(path).expect("Something went wrong reading the file")
 }
 
 #[cfg(test)]

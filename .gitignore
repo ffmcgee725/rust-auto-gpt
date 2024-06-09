@@ -1,5 +1,6 @@
 /target
 /src/templates/web_server/target
+# TODO: add frontend build path
 
 .env
 .DS_Store
