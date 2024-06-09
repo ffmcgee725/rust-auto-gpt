@@ -7,7 +7,7 @@ use serde::de::DeserializeOwned;
 
 pub const WEB_SERVER_PROJECT_PATH: &str = "src/templates/web_server";
 pub const WEB_APP_PROJECT_PATH: &str = "src/templates/web_app";
-pub const API_SCHEMA_JSON: &str = "schemas/api_schema.json";
+pub const API_SCHEMA_JSON: &str = "src/templates/web_server/schema/api_schema.json";
 const CODE_TEMPLATE_PATH: &str = "src/templates/web_server/src/code_template.rs";
 const EXEC_MAIN_PATH: &str = "src/templates/web_server/src/main.rs";
 

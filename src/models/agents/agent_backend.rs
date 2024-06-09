@@ -307,7 +307,14 @@ impl SpecialFunctions for AgentBackendDeveloper {
                     let endpoints_to_check: Vec<RouteObject> = self
                         .extract_and_test_rest_api_endpoints(&api_endpoints_str)
                         .await;
-                    fact_sheet.api_endpoint_schema = Some(endpoints_to_check.clone());
+
+                    let api_endpoint_full_schema: Vec<RouteObject> =
+                        serde_json::from_str(&api_endpoints_str).expect(
+                            format!("Failed to decode API endpoints: {}", &api_endpoints_str)
+                                .as_str(),
+                        );
+
+                    fact_sheet.api_endpoint_schema = Some(api_endpoint_full_schema);
 
                     self.run_code(&endpoints_to_check).await;
                     save_api_endpoints(&api_endpoints_str);
