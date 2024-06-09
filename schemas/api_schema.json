@@ -1,0 +1,11 @@
+[
+  {
+    "route": "/cat",
+    "is_route_dynamic": false,
+    "method": "get",
+    "request_body": "None",
+    "response": {
+      "url": "string"
+    }
+  }
+]

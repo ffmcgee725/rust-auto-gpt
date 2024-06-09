@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "2": { "id": 2, "name": "one more schmeking", "completed": false },
+    "1": { "id": 1, "name": "inting -- updated", "completed": true }
+  },
+  "users": {
+    "1": { "id": 1, "username": "corno_manso", "password": "mansisimo" },
+    "2": { "id": 2, "username": "alpha_male", "password": "the_maliest" }
+  }
+}

@@ -1,0 +1,5 @@
+/target
+/src/templates/web_server/target
+
+.env
+.DS_Store
