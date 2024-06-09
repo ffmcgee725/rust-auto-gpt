@@ -1,11 +1,11 @@
 use crate::ai_functions::frontend::{
-    print_code_bugs_resolution, print_recommended_site_main_colours, print_recommended_site_pages,
+    print_code_bugs_resolution, print_recommended_site_main_colors, print_recommended_site_pages,
     print_recommended_site_pages_with_apis,
 };
 use crate::helpers::command_line::PrintCommand;
 use crate::helpers::utils::{
     ai_task_request, ai_task_request_decoded, read_frontend_code_contents, save_frontend_code,
-    WEB_APP_PROJECT_PATH, WEB_SERVER_PROJECT_PATH,
+    API_SCHEMA_JSON, WEB_APP_PROJECT_PATH, WEB_SERVER_PROJECT_PATH,
 };
 use crate::models::agent_basic::basic_agent::{AgentState, BasicAgent};
 use crate::models::agent_basic::basic_traits::BasicTraits;
@@ -53,24 +53,22 @@ pub struct SitePages {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DesignBuildSheet {
     pub pages: Option<Vec<String>>,
-    pub pages_descriptons: Option<Vec<SitePages>>,
+    pub pages_descriptions: Option<Vec<SitePages>>,
     pub api_assignments: Option<PageRoutes>,
-    pub brand_colours: Option<Vec<String>>,
+    pub brand_colors: Option<Vec<String>>,
     pub build_mode: FrontendBuildMode,
 }
 
-// Solution Architect
 #[derive(Debug)]
 pub struct AgentFrontendDeveloper {
     pub attributes: BasicAgent,
-    pub buildsheet: DesignBuildSheet,
+    pub build_sheet: DesignBuildSheet,
     pub bug_count: u8,
     pub operation_focus: BuildComponent,
 }
 
 impl AgentFrontendDeveloper {
     pub fn new() -> Self {
-        // Define attributes
         let attributes: BasicAgent = BasicAgent {
             objective: "Develops frontned code for website".to_string(),
             position: "Frontend Developer".to_string(),
@@ -78,47 +76,41 @@ impl AgentFrontendDeveloper {
             memory: vec![],
         };
 
-        // Define Buildsheet
-        let buildsheet: DesignBuildSheet = DesignBuildSheet {
+        let build_sheet: DesignBuildSheet = DesignBuildSheet {
             pages: None,
-            pages_descriptons: None,
+            pages_descriptions: None,
             api_assignments: None,
-            brand_colours: None,
+            brand_colors: None,
             build_mode: FrontendBuildMode::Infrastructure,
         };
 
-        // Return Self
-        Self {
+        return Self {
             attributes,
-            buildsheet,
+            build_sheet,
             bug_count: 0,
             operation_focus: BuildComponent::Logo,
-        }
+        };
     }
 
     // Confirms what stage the Frontend Agent is in
     fn confirm_stage(&self) {
-        match self.buildsheet.build_mode {
+        match self.build_sheet.build_mode {
             FrontendBuildMode::Infrastructure => println!("[Working on Frontend Infrastructure]"),
             FrontendBuildMode::PageComponents => println!("[Working on Frontend Page Components]"),
             FrontendBuildMode::Completion => println!("[Working on Frontend Completion Items]"),
         }
     }
 
-    // Get pages and page context from description and backend code
     async fn get_page_context(&mut self, project_description: &String) {
-        // Extract backend code
         let path: String = format!("{}/src/main.rs", WEB_SERVER_PROJECT_PATH);
         let backend_code: String =
             fs::read_to_string(path).expect("Something went wrong reading the file");
 
-        // Structure Message
         let msg_context: String = format!(
             "PROJECT_DESCRIPTION: {:?}, CODE_LOGIC: {:?}",
             project_description, backend_code
         );
 
-        // Call AI
         let ai_response: Vec<SitePages> = ai_task_request_decoded::<Vec<SitePages>>(
             msg_context,
             &self.attributes.position,
@@ -127,15 +119,14 @@ impl AgentFrontendDeveloper {
         )
         .await;
 
-        // Extract pages
         let pages: Vec<String> = ai_response
             .iter()
             .filter_map(|item| Some(item.page_name.clone()))
             .collect();
 
         // Assign pages to buildsheet
-        self.buildsheet.pages = Some(pages.clone());
-        self.buildsheet.pages_descriptons = Some(ai_response);
+        self.build_sheet.pages = Some(pages);
+        self.build_sheet.pages_descriptions = Some(ai_response);
     }
 
     // Assign API Routes to pages
@@ -144,18 +135,15 @@ impl AgentFrontendDeveloper {
         project_description: &String,
         external_api_urls: &Option<Vec<String>>,
     ) {
-        // Extract internal API schema
-        let path: String = format!("{}/api_endpoints.json", WEB_SERVER_PROJECT_PATH);
+        let path: String = API_SCHEMA_JSON.to_string();
         let internal_api_endpoints: String =
             fs::read_to_string(path).expect("Something went wrong reading the file");
 
-        // Extract external API endpoints
         let external_api_endpoints: String = match external_api_urls {
             Some(endpoints) => format!("{:?}", endpoints),
             None => String::from(""),
         };
 
-        // Structure message for api route assignment
         let msg_context: String = format!(
             "WEBSITE SPECIFICATION: {{
       PROJECT_DESCRIPTION: {},
@@ -164,12 +152,11 @@ impl AgentFrontendDeveloper {
       EXTERNAL_API_ROUTES: {} 
     }}",
             project_description,
-            self.buildsheet.pages,
+            self.build_sheet.pages,
             internal_api_endpoints,
             external_api_endpoints
         );
 
-        // Call AI
         let ai_response: PageRoutes = ai_task_request_decoded::<PageRoutes>(
             msg_context,
             &self.attributes.position,
@@ -178,45 +165,36 @@ impl AgentFrontendDeveloper {
         )
         .await;
 
-        // Add API assignments to buildsheet
-        self.buildsheet.api_assignments = Some(ai_response);
+        self.build_sheet.api_assignments = Some(ai_response);
     }
 
-    // Define Brand Colours
-    async fn define_brand_colours(&mut self, project_description: &String) {
-        // Structure message
+    async fn define_brand_colors(&mut self, project_description: &String) {
         let msg_context: String = format!(
             "PROJECT_DESCRIPTION: {}, WEBSITE_CONTENT: {:?}",
-            project_description, self.buildsheet.pages_descriptons
+            project_description, self.build_sheet.pages_descriptions
         );
 
-        // Call AI
         let ai_response: Vec<String> = ai_task_request_decoded::<Vec<String>>(
             msg_context,
             &self.attributes.position,
-            get_function_string!(print_recommended_site_main_colours),
-            print_recommended_site_main_colours,
+            get_function_string!(print_recommended_site_main_colors),
+            print_recommended_site_main_colors,
         )
         .await;
 
-        // Add decoded brand colours
-        self.buildsheet.brand_colours = Some(ai_response);
+        self.build_sheet.brand_colors = Some(ai_response);
     }
 
-    // Fix buggy component code
     async fn run_code_correction(&self, file_path: String, error_code: String) {
-        // Initialize
         PrintCommand::UnitTest
             .print_agent_message(self.attributes.position.as_str(), "Fixing component bugs");
         let buggy_code: String = read_frontend_code_contents(&file_path);
 
-        // Structure message
         let msg_context: String = format!(
             "ORIGINAL_CODE: {}, ERROR_MESSAGE: {:?}",
             buggy_code, error_code
         );
 
-        // Retrieve AI Reponse
         let ai_response: String = ai_task_request(
             msg_context,
             &self.attributes.position,
@@ -225,13 +203,11 @@ impl AgentFrontendDeveloper {
         )
         .await;
 
-        // Save corrected code
         save_frontend_code(&file_path, &ai_response);
     }
 
-    // Frontend component test
     async fn perform_component_test(&mut self) -> Result<(), String> {
-        let test_statement = format!("Testing Component: {}", self.operation_focus.name());
+        let test_statement: String = format!("Testing Component: {}", self.operation_focus.name());
         PrintCommand::UnitTest
             .print_agent_message(self.attributes.position.as_str(), test_statement.as_str());
         let build_frontend_server: std::process::Output = Command::new("yarn")
@@ -242,7 +218,6 @@ impl AgentFrontendDeveloper {
             .output()
             .expect("Failed to run component test");
 
-        // Determine if build errors
         if build_frontend_server.status.success() {
             PrintCommand::UnitTest.print_agent_message(
                 self.attributes.position.as_str(),
@@ -250,13 +225,10 @@ impl AgentFrontendDeveloper {
             );
             self.bug_count = 0;
             return Ok(());
-
-        // Handle Build error
         } else {
             let error_arr: Vec<u8> = build_frontend_server.stderr;
             let error_str: String = String::from_utf8(error_arr).unwrap();
 
-            // Check and return error
             self.bug_count += 1;
             if self.bug_count >= 2 {
                 PrintCommand::Issue.print_agent_message(
@@ -286,11 +258,11 @@ impl SpecialFunctions for AgentFrontendDeveloper {
 
     async fn execute(
         &mut self,
-        factsheet: &mut FactSheet,
+        fact_sheet: &mut FactSheet,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        // Extract required project factsheet items
-        let project_description: &String = &factsheet.project_description;
-        let external_api_urls: &Option<Vec<String>> = &factsheet.external_urls;
+        // Extract required project fact sheet items
+        let project_description: &String = &fact_sheet.project_description;
+        let external_api_urls: &Option<Vec<String>> = &fact_sheet.external_urls;
 
         // Continue until finished
         // !!! WARNING !!!
@@ -302,17 +274,13 @@ impl SpecialFunctions for AgentFrontendDeveloper {
                     // Confirm Stage
                     self.confirm_stage();
 
-                    // Get pages and page context
                     self.get_page_context(&project_description).await;
 
-                    // Assign API routes to pages
                     self.assign_api_routes(&project_description, &external_api_urls)
                         .await;
 
-                    // Define Brand Colours
-                    self.define_brand_colours(&project_description).await;
+                    self.define_brand_colors(&project_description).await;
 
-                    // Proceed to Working status
                     self.attributes.state = AgentState::Working;
                     continue;
                 }
@@ -390,7 +358,7 @@ pub mod tests {
         // Create agent instance and site purpose
         let mut agent: AgentFrontendDeveloper = AgentFrontendDeveloper::new();
         agent.attributes.state = AgentState::Working;
-        agent.buildsheet.pages = Some(vec!["home_page".to_string(), "about_page".to_string()]);
+        agent.build_sheet.pages = Some(vec!["home_page".to_string(), "about_page".to_string()]);
 
         // Initialze Factsheet
         let mut factsheet: FactSheet = serde_json::from_str("{\"project_description\":\"Build a todo app for a fitness tracking goal\",\"project_scope\":{\"is_crud_required\":true,\"is_user_login_and_logout\":true,\"is_external_urls_required\":true},\"external_urls\":[\"https://api.exchangeratesapi.io/latest\"],\"backend_code\":null,\"frontend_code\":null,\"json_db_schema\":null}").unwrap();
@@ -413,7 +381,7 @@ pub mod tests {
         let buildsheet: DesignBuildSheet = serde_json::from_str(buildsheet_str).unwrap();
         agent.attributes.state = AgentState::Working;
 
-        agent.buildsheet = buildsheet;
+        agent.build_sheet = buildsheet;
         agent
             .execute(&mut factsheet)
             .await

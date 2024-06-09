@@ -3,8 +3,8 @@ use ai_functions::ai_function;
 // Fix buggy component code
 #[ai_function]
 pub fn print_code_bugs_resolution(_existing_code_and_error: &str) {
-  /// INPUT: Takes in existing code causing build failres along with errors caused by the code
-  /// FUNCTION: Writes the new and imporved React typescript component code with bugs fixed
+  /// INPUT: Takes in existing code causing build failures along with errors caused by the code
+  /// FUNCTION: Writes the new and improved React typescript component code with bugs fixed
   /// NOTES: 
   ///   1. Functions considers that the code is made of React Typescript.
   ///   2. Function removes anything which does not belong on the page, like ```typescript for example. Code should start with imports.
@@ -68,7 +68,7 @@ pub fn print_recommended_site_pages(_project_description_and_backend_code_logic:
 #[ai_function]
 pub fn print_recommended_site_pages_with_apis(_website_specification: &str) {
   /// INPUT: Takes in a PROJECT_DESCRIPTION, and WEBSITE_SPECIFICATION with API_ENDPOINTS and PAGES for a websites frontend build.
-  /// FUNCTION: Assignes endpoints to each page
+  /// FUNCTION: Assigns endpoints to each page
   /// OUTPUT FORMAT: The function outputs in a JSON format as follows:
   ///   [
   ///     "page_name": [
@@ -117,7 +117,7 @@ pub fn print_recommended_site_pages_with_apis(_website_specification: &str) {
 
 // Branding - Colour
 #[ai_function]
-pub fn print_recommended_site_main_colours(_website_content: &str) {
+pub fn print_recommended_site_main_colors(_website_content: &str) {
   /// INPUT: Takes in a PROJECT_DESCRIPTION and WEBSITE_CONTENT for a frontend website project
   /// FUNCTION: Outputs up to 3 recommended colours that would BEST suit the PROJECT_DESCRIPTION and nature of the website
   /// FORMAT: Prints just a list of strings based on Tailwind css colours, here are some examples:

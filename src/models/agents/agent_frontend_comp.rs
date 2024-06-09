@@ -63,14 +63,14 @@ impl BuildComponent {
         project_description: &String,
     ) {
         // Extract pages
-        let pages: &Vec<String> = agent.buildsheet.pages.as_ref().expect("Missing pages");
+        let pages: &Vec<String> = agent.build_sheet.pages.as_ref().expect("Missing pages");
 
         match self {
             Self::Logo => {
                 // Create SVG: Structure message
                 let msg_context: String = format!(
                     "PROJECT_DESCRIPTION: {}, BRAND_COLOURS: {:?}",
-                    project_description, agent.buildsheet.brand_colours
+                    project_description, agent.build_sheet.brand_colors
                 );
 
                 // Create SVG: Retrieve AI Reponse
@@ -107,7 +107,7 @@ impl BuildComponent {
             PAGES_WHICH_NEED_LINKS: {:?},
             COLOUR_SCHEME: {:?}
           }}",
-                    project_description, pages, agent.buildsheet.brand_colours
+                    project_description, pages, agent.build_sheet.brand_colors
                 );
 
                 // Create and Save
@@ -148,13 +148,13 @@ impl BuildComponent {
                 let react_hook_contents: String = read_frontend_code_contents(&file_path);
 
                 let page_api_endpoints = agent
-                    .buildsheet
+                    .build_sheet
                     .api_assignments
                     .as_ref()
                     .unwrap()
                     .get(page_name);
 
-                let page_description: String = agent.buildsheet.pages_descriptons.as_ref().unwrap()
+                let page_description: String = agent.build_sheet.pages_descriptions.as_ref().unwrap()
                     [page_index]
                     .suggested_content_sections
                     .to_string();
