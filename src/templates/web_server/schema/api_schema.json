@@ -1,11 +1,17 @@
 [
   {
-    "route": "/cat",
+    "route": "/token",
     "is_route_dynamic": false,
-    "method": "get",
-    "request_body": "None",
+    "method": "post",
+    "request_body": {
+      "address": "string",
+      "block": "number",
+      "price": "number"
+    },
     "response": {
-      "url": "string"
+      "address": "string",
+      "block": "number",
+      "price": "number"
     }
   }
 ]
